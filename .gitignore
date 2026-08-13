@@ -7,6 +7,8 @@ yarn-error.log
 dist/
 build/
 *.pbiviz
+.tmp/
+webpack.statistics.dev.html
 
 # IDE
 .vscode/
@@ -26,3 +28,4 @@ Thumbs.db
 # pbiviz specific
 .pbiviz
 pbiviz-cert.pem
+
