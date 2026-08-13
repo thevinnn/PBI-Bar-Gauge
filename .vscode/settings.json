@@ -36,5 +36,6 @@
             ],            
             "url": "./node_modules/powerbi-visuals-api/schema.dependencies.json"
         }        
-    ]    
+    ],
+    "js/ts.tsdk.path": "node_modules\\typescript\\lib"
 }
