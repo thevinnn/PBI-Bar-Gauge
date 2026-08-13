@@ -1,28 +1,3 @@
-/*
-*  Power BI Visual CLI
-*
-*  Copyright (c) Microsoft Corporation
-*  All rights reserved.
-*  MIT License
-*
-*  Permission is hereby granted, free of charge, to any person obtaining a copy
-*  of this software and associated documentation files (the ""Software""), to deal
-*  in the Software without restriction, including without limitation the rights
-*  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-*  copies of the Software, and to permit persons to whom the Software is
-*  furnished to do so, subject to the following conditions:
-*
-*  The above copyright notice and this permission notice shall be included in
-*  all copies or substantial portions of the Software.
-*
-*  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-*  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-*  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-*  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-*  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-*  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-*  THE SOFTWARE.
-*/
 "use strict";
 
 import powerbi from "powerbi-visuals-api";
@@ -36,12 +11,17 @@ import IVisual = powerbi.extensibility.visual.IVisual;
 import IVisualEventService = powerbi.extensibility.IVisualEventService;
 
 import { VisualFormattingSettingsModel } from "./settings";
+import * as d3 from "d3";
 
 export class Visual implements IVisual {
     private events: IVisualEventService;
     private target: HTMLElement;
     private formattingSettings: VisualFormattingSettingsModel;
     private formattingSettingsService: FormattingSettingsService;
+    private svgRoot: d3.Selection<SVGElement, unknown, null, undefined>;
+    private ellipse: d3.Selection<SVGElement, unknown, null, undefined>;
+    private text: d3.Selection<SVGElement, unknown, null, undefined>;
+
 
     // D3 chart members
     private svg: d3.Selection<SVGSVGElement, unknown, null, undefined>;
@@ -56,6 +36,7 @@ export class Visual implements IVisual {
 
     constructor(options: VisualConstructorOptions) {
         console.log('Visual constructor', options);
+<<<<<<< HEAD
         this.events = options.host.eventService;
         this.formattingSettingsService = new FormattingSettingsService();
         this.target = options.element;
@@ -73,11 +54,30 @@ export class Visual implements IVisual {
             this.yAxisGroup = this.svg.append("g")
                 .attr("class", "y-axis");
         }
+=======
+
+        this.svgRoot = d3.select(options.element).append("svg");
+        this.ellipse = this.svgRoot.append("ellipse").style("fill", "lightblue").style("stroke", "black").style("stroke-width", 2).style("stroke-width", 4);
+        this.text = this.svgRoot.append("text");
+
+>>>>>>> 86cf0d4b545a70dbef5a620c800a5dda66ab5d11
     }
 
     public update(options: VisualUpdateOptions) {
+        this.svgRoot.attr("width", options.viewport.width)
+            .attr("height", options.viewport.height);
+
+        this.ellipse.attr("cx", options.viewport.width / 2)
+            .attr("cy", options.viewport.height / 2)
+            .attr("rx", options.viewport.width / 2.5)
+            .attr("ry", options.viewport.height / 2.5);
+
+        this.text.attr("x", options.viewport.width / 2)
+            .attr("y", options.viewport.height / 2)
+            .text(`Update count: TEST`);
         this.events.renderingStarted(options);
 
+<<<<<<< HEAD
         try {
             this.formattingSettings = this.formattingSettingsService.populateFormattingSettingsModel(VisualFormattingSettingsModel, options.dataViews[0]);
 
@@ -118,6 +118,8 @@ export class Visual implements IVisual {
             console.log('Error in update method', error);
             this.events.renderingFailed(options, String(error))
         }
+=======
+>>>>>>> 86cf0d4b545a70dbef5a620c800a5dda66ab5d11
     }
 
     /**
