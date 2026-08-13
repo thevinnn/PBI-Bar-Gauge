@@ -26,3 +26,4 @@ Thumbs.db
 # pbiviz specific
 .pbiviz
 pbiviz-cert.pem
+webpack.statistics.dev.html
