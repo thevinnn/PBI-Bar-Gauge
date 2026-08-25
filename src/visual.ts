@@ -29,6 +29,7 @@ export class Visual implements IVisual {
     private readonly marginBottom = 30;
     private readonly marginLeft = 40;
 
+
     constructor(options: VisualConstructorOptions) {
         console.log('Visual constructor', options);
         this.events = options.host.eventService;
@@ -52,6 +53,13 @@ export class Visual implements IVisual {
 
     public update(options: VisualUpdateOptions) {
         this.events.renderingStarted(options);
+        const data = [
+            { month: "Jan", value: 42 },
+            { month: "Feb", value: 71 },
+            { month: "Mar", value: 55 },
+        ];
+
+
 
         try {
             this.formattingSettings = this.formattingSettingsService.populateFormattingSettingsModel(VisualFormattingSettingsModel, options.dataViews[0]);
@@ -62,30 +70,50 @@ export class Visual implements IVisual {
             const width = options.viewport.width;
             const height = options.viewport.height;
 
+            const x2 = d3.scaleBand()
+                .domain(data.map(d => d.month))   // ["Jan", "Feb", "Mar"]
+                .range([this.marginLeft, width - this.marginRight])
+                .padding(0.1);
+
+            const y2 = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.value)])   // 0 to the largest value
+                .range([height - this.marginBottom, this.marginTop]);// gap between bars
+
+            const barsGroup = this.svg.append("g").attr("class", "bars");
+
+            barsGroup.selectAll("rect")
+                .data(data)
+                .join("rect")
+                .attr("x", d => y2(d.value))
+                .attr("y", d => x2(d.month))
+                .attr("height", x2.bandwidth())
+                .attr("width", d => y2(0) - y2(d.value))
+                .attr("fill", "steelblue");
+
             this.svg
                 .attr("width", width)
                 .attr("height", height)
                 .attr("viewBox", `0 0 ${width} ${height}`);
 
             // Declare the x (horizontal position) scale.
-            const x = d3.scaleUtc()
-                .domain([new Date("2023-01-01"), new Date("2024-01-01")])
-                .range([this.marginLeft, width - this.marginRight]);
+            // const x = d3.scaleUtc()
+            //     .domain([new Date("2023-01-01"), new Date("2024-01-01")])
+            //     .range([this.marginLeft, width - this.marginRight]);
 
-            // Declare the y (vertical position) scale.
-            const y = d3.scaleLinear()
-                .domain([0, 100])
-                .range([height - this.marginBottom, this.marginTop]);
+            // // Declare the y (vertical position) scale.
+            // const y = d3.scaleLinear()
+            //     .domain([0, 100])
+            //     .range([height - this.marginBottom, this.marginTop]);
 
-            // Update the x-axis.
-            this.xAxisGroup
-                .attr("transform", `translate(0,${height - this.marginBottom})`)
-                .call(d3.axisBottom(x) as any);
+            // // Update the x-axis.
+            // this.xAxisGroup
+            //     .attr("transform", `translate(0,${height - this.marginBottom})`)
+            //     .call(d3.axisBottom(x) as any);
 
-            // Update the y-axis.
-            this.yAxisGroup
-                .attr("transform", `translate(${this.marginLeft},0)`)
-                .call(d3.axisLeft(y) as any);
+            // // Update the y-axis.
+            // this.yAxisGroup
+            //     .attr("transform", `translate(${this.marginLeft},0)`)
+            //     .call(d3.axisLeft(y) as any);
 
             this.events.renderingFinished(options);
         }
