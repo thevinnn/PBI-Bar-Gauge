@@ -22,6 +22,7 @@ export class Visual implements IVisual {
     private svg: d3.Selection<SVGSVGElement, unknown, null, undefined>;
     private xAxisGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
     private yAxisGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
+    private barsGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
 
     // Chart margins (kept as instance state so update() can reuse them)
     private readonly marginTop = 20;
@@ -48,6 +49,9 @@ export class Visual implements IVisual {
 
             this.yAxisGroup = this.svg.append("g")
                 .attr("class", "y-axis");
+
+            this.barsGroup = this.svg.append("g")
+                .attr("class", "bars");
         }
     }
 
@@ -70,50 +74,41 @@ export class Visual implements IVisual {
             const width = options.viewport.width;
             const height = options.viewport.height;
 
-            const x2 = d3.scaleBand()
+            const y = d3.scaleBand()
                 .domain(data.map(d => d.month))   // ["Jan", "Feb", "Mar"]
-                .range([this.marginLeft, width - this.marginRight])
-                .padding(0.1);
+                .range([this.marginTop, height - this.marginBottom])  
+                .padding(0.1);                  // gap between bars
 
-            const y2 = d3.scaleLinear()
+
+            const x = d3.scaleLinear()
                 .domain([0, d3.max(data, d => d.value)])   // 0 to the largest value
-                .range([height - this.marginBottom, this.marginTop]);// gap between bars
+                .range([this.marginLeft, width - this.marginRight]);                     // gap between bars
 
-            const barsGroup = this.svg.append("g").attr("class", "bars");
 
-            barsGroup.selectAll("rect")
+            this.barsGroup.selectAll("rect")
                 .data(data)
                 .join("rect")
-                .attr("x", d => y2(d.value))
-                .attr("y", d => x2(d.month))
-                .attr("height", x2.bandwidth())
-                .attr("width", d => y2(0) - y2(d.value))
+                .attr("x", d => x(0))
+                .attr("y", d => y(d.month))
+                .attr("width", d => x(d.value) - x(0))  // width of the bar based on value
+                .attr("height", y.bandwidth())
                 .attr("fill", "steelblue");
+
+                console.log('Bars drawn', this.barsGroup.selectAll("rect").attr("x"), this.barsGroup.selectAll("rect").attr("y"));
 
             this.svg
                 .attr("width", width)
                 .attr("height", height)
                 .attr("viewBox", `0 0 ${width} ${height}`);
 
-            // Declare the x (horizontal position) scale.
-            // const x = d3.scaleUtc()
-            //     .domain([new Date("2023-01-01"), new Date("2024-01-01")])
-            //     .range([this.marginLeft, width - this.marginRight]);
+            this.xAxisGroup
+                .attr("transform", `translate(0,${height - this.marginBottom})`)
+                .call(d3.axisBottom(x) as any);
 
-            // // Declare the y (vertical position) scale.
-            // const y = d3.scaleLinear()
-            //     .domain([0, 100])
-            //     .range([height - this.marginBottom, this.marginTop]);
-
-            // // Update the x-axis.
-            // this.xAxisGroup
-            //     .attr("transform", `translate(0,${height - this.marginBottom})`)
-            //     .call(d3.axisBottom(x) as any);
-
-            // // Update the y-axis.
-            // this.yAxisGroup
-            //     .attr("transform", `translate(${this.marginLeft},0)`)
-            //     .call(d3.axisLeft(y) as any);
+            // Update the y-axis.
+            this.yAxisGroup
+                .attr("transform", `translate(${this.marginLeft},0)`)
+                .call(d3.axisLeft(y) as any);
 
             this.events.renderingFinished(options);
         }
