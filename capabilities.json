@@ -9,6 +9,11 @@
             "displayName": "Measure Data",
             "name": "measure",
             "kind": "Measure"
+        },
+        {
+            "displayName": "Target Value",
+            "name": "target",
+            "kind": "Measure"
         }
     ],
     "objects": {
@@ -42,7 +47,7 @@
                         "fill": {}
                     }
                 },
-                 "fontSize": {
+                "fontSize": {
                     "type": {
                         "formatting": {
                             "fontSize": true
@@ -64,13 +69,21 @@
                     }
                 },
                 "values": {
-                    "select": [
-                        {
-                            "bind": {
-                                "to": "measure"
+                    "group": {
+                        "by": "category",
+                        "select": [
+                            {
+                                "bind": {
+                                    "to": "measure"
+                                }
+                            },
+                            {
+                                "bind": {
+                                    "to": "target"
+                                }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             }
         }
