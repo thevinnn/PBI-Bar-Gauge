@@ -32,43 +32,44 @@ import FormattingSettingsCard = formattingSettings.SimpleCard;
 import FormattingSettingsSlice = formattingSettings.Slice;
 import FormattingSettingsModel = formattingSettings.Model;
 
+
 /**
- * Data Point Formatting Card
+ * Bar Gauge visual settings
  */
-class DataPointCardSettings extends FormattingSettingsCard {
-    defaultColor = new formattingSettings.ColorPicker({
-        name: "defaultColor",
-        displayName: "Default color",
-        value: { value: "" }
+
+class BarSettings extends FormattingSettingsCard {
+    public BarColour = new formattingSettings.ColorPicker({
+        name: "BarColour",
+        displayName: "Bar Colour",
+        value: { value: "#01B8AA" },
+        visible: true
     });
 
-    showAllDataPoints = new formattingSettings.ToggleSwitch({
-        name: "showAllDataPoints",
-        displayName: "Show all",
-        value: true
+    name: string = "bar";
+    displayName: string = "Bar Settings";
+    visible: boolean = true;
+    slices: Array<FormattingSettingsSlice> = [this.BarColour];
+}
+
+class TargetLineSettings extends FormattingSettingsCard {
+    public TargetLineColour = new formattingSettings.ColorPicker({
+        name: "TargetLineColour",
+        displayName: "Target Line Colour",
+        value: { value: "#FF0000" },
+        visible: true
     });
 
-    fill = new formattingSettings.ColorPicker({
-        name: "fill",
-        displayName: "Fill",
-        value: { value: "" }
+    public TargetLineVisible = new formattingSettings.ToggleSwitch({
+        name: "TargetLineVisible",
+        displayName: "Show Target Line",
+        value: true,
+        visible: true
     });
 
-    fillRule = new formattingSettings.ColorPicker({
-        name: "fillRule",
-        displayName: "Color saturation",
-        value: { value: "" }
-    });
-
-    fontSize = new formattingSettings.NumUpDown({
-        name: "fontSize",
-        displayName: "Text Size",
-        value: 12
-    });
-
-    name: string = "dataPoint";
-    displayName: string = "Data colors";
-    slices: Array<FormattingSettingsSlice> = [this.defaultColor, this.showAllDataPoints, this.fill, this.fillRule, this.fontSize];
+    name: string = "targetLine";
+    displayName: string = "Target Line Settings";
+    visible: boolean = true;
+    slices: Array<FormattingSettingsSlice> = [this.TargetLineColour, this.TargetLineVisible];
 }
 
 /**
@@ -77,7 +78,10 @@ class DataPointCardSettings extends FormattingSettingsCard {
 */
 export class VisualFormattingSettingsModel extends FormattingSettingsModel {
     // Create formatting settings model formatting cards
-    dataPointCard = new DataPointCardSettings();
+    barSettings = new BarSettings();
+    targetLineSettings = new TargetLineSettings();
 
-    cards = [this.dataPointCard];
+    cards = [this.barSettings, this.targetLineSettings];
+
+
 }

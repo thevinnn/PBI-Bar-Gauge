@@ -11,12 +11,23 @@ import IVisual = powerbi.extensibility.visual.IVisual;
 import IVisualEventService = powerbi.extensibility.IVisualEventService;
 
 import { VisualFormattingSettingsModel } from "./settings";
+import {
+    createTooltipServiceWrapper,
+    ITooltipServiceWrapper
+} from "powerbi-visuals-utils-tooltiputils";
+
+type BarDatum = {
+    category: string;
+    value: number;
+    target: number | null;
+};
 
 export class Visual implements IVisual {
     private events: IVisualEventService;
     private target: HTMLElement;
     private formattingSettings: VisualFormattingSettingsModel;
     private formattingSettingsService: FormattingSettingsService;
+    private tooltipServiceWrapper: ITooltipServiceWrapper;
     private dataView: powerbi.DataView;
 
     // D3 chart members
@@ -41,7 +52,7 @@ export class Visual implements IVisual {
         this.events = options.host.eventService;
         this.formattingSettingsService = new FormattingSettingsService();
         this.target = options.element;
-
+        this.tooltipServiceWrapper = createTooltipServiceWrapper(options.host.tooltipService, options.element);
         if (document) {
             // Create the SVG container once; it will be resized/redrawn in update()
             this.svg = d3.select(this.target)
@@ -82,7 +93,7 @@ export class Visual implements IVisual {
         const valueColumn = categorical.values[0];
         const targetColumn = categorical.values[1];
 
-        const data = categoryColumn.values.map((categoryValue, i) => ({
+        const data: BarDatum[] = categoryColumn.values.map((categoryValue, i) => ({
             category: String(categoryValue),
             value: Number(valueColumn.values[i]),
             target: targetColumn ? Number(targetColumn.values[i]) : null
@@ -110,26 +121,53 @@ export class Visual implements IVisual {
                 .range([this.marginLeft, width - this.marginRight]);                     // gap between bars
 
 
-            this.barScale.selectAll("rect")
-                .data(data)
-                .join("rect")
-                .attr("x", d => x(0))
-                .attr("y", d => y(d.category))
-                .attr("width", width - this.marginRight - this.marginLeft)  // width of the bar based on value
-                .attr("height", y.bandwidth())
-                .attr("fill", "#eee")
-                .attr("rx", 4);
+
+            // this.barScale.selectAll("rect")
+            //     .data(data)
+            //     .join("rect")
+            //     .attr("x", d => x(0))
+            //     .attr("y", d => y(d.category))
+            //     .attr("width", width - this.marginRight - this.marginLeft)  // width of the bar based on value
+            //     .attr("height", y.bandwidth())
+            //     .attr("fill", "#eee")
+            //     .attr("rx", 4);
 
 
-            this.barsGroup.selectAll("rect")
+            const bars = this.barsGroup
+                .selectAll<SVGRectElement, BarDatum>("rect")
                 .data(data)
                 .join("rect")
                 .attr("x", d => x(0))
                 .attr("y", d => y(d.category))
                 .attr("width", d => x(d.value) - x(0))  // width of the bar based on value
                 .attr("height", y.bandwidth())
-                .attr("fill", "steelblue")
+                .attr("fill", this.formattingSettings.barSettings.BarColour.value.value)
                 .attr("rx", 4);
+
+            this.tooltipServiceWrapper.addTooltip(
+                bars,
+                (d: BarDatum) => {
+                    const tooltipData = [
+                        {
+                            displayName: "Category",
+                            value: d.category
+                        },
+                        {
+                            displayName: "Value",
+                            value: d.value.toString()
+                        }
+                    ];
+
+                    if (d.target !== null) {
+                        tooltipData.push({
+                            displayName: "Target",
+                            value: d.target.toString()
+                        });
+                    }
+
+                    return tooltipData;
+                }
+            );
 
             console.log('Bars drawn', this.barsGroup.selectAll("rect").attr("x"), this.barsGroup.selectAll("rect").attr("y"));
 
@@ -144,7 +182,7 @@ export class Visual implements IVisual {
                 .attr("y1", (this.marginTop * 1.3))
                 .attr("x2", d => x(d.target)) // Add target value
                 .attr("y2", height - (this.marginBottom * 1.3))
-                .attr("stroke", "red")
+                .attr("stroke", this.formattingSettings.targetLineSettings.TargetLineColour.value.value)
                 .attr("stroke-width", 2)
                 .attr("stroke-dasharray", "4,4");
 

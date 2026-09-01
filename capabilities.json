@@ -17,9 +17,9 @@
         }
     ],
     "objects": {
-        "dataPoint": {
+        "bar": {
             "properties": {
-                "defaultColor": {
+                "BarColour": {
                     "type": {
                         "fill": {
                             "solid": {
@@ -32,8 +32,12 @@
                     "type": {
                         "bool": true
                     }
-                },
-                "fill": {
+                }
+            }
+        },
+        "targetLine": {
+            "properties": {
+                "TargetLineColour": {
                     "type": {
                         "fill": {
                             "solid": {
@@ -42,16 +46,9 @@
                         }
                     }
                 },
-                "fillRule": {
+                "TargetLineVisible": {
                     "type": {
-                        "fill": {}
-                    }
-                },
-                "fontSize": {
-                    "type": {
-                        "formatting": {
-                            "fontSize": true
-                        }
+                        "bool": true
                     }
                 }
             }
