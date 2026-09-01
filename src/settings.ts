@@ -31,6 +31,7 @@ import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
 import FormattingSettingsCard = formattingSettings.SimpleCard;
 import FormattingSettingsSlice = formattingSettings.Slice;
 import FormattingSettingsModel = formattingSettings.Model;
+import powerbi from "powerbi-visuals-api";
 
 
 /**
@@ -59,17 +60,41 @@ class TargetLineSettings extends FormattingSettingsCard {
         visible: true
     });
 
-    public TargetLineVisible = new formattingSettings.ToggleSwitch({
+    TargetLineVisible = new formattingSettings.ToggleSwitch({
         name: "TargetLineVisible",
         displayName: "Show Target Line",
         value: true,
         visible: true
     });
 
+    TargetLineWidth = new formattingSettings.NumUpDown({
+        name: "TargetLineWidth",
+        displayName: "Target Line Width",
+        value: 2,
+        options: {
+            minValue: {
+                type: powerbi.visuals.ValidatorType.Min,
+                value: 1
+            },
+            maxValue: {
+                type: powerbi.visuals.ValidatorType.Max,
+                value: 10
+            }
+        },
+        visible: true
+    });
+
+    TargetLineStyle = new formattingSettings.AutoDropdown({
+        name: "TargetLineStyle",
+        displayName: "Target Line Style",
+        value: "solid",
+        visible: true
+    });
+
     name: string = "targetLine";
     displayName: string = "Target Line Settings";
     visible: boolean = true;
-    slices: Array<FormattingSettingsSlice> = [this.TargetLineColour, this.TargetLineVisible];
+    slices: Array<FormattingSettingsSlice> = [this.TargetLineColour, this.TargetLineVisible, this.TargetLineWidth, this.TargetLineStyle];
 }
 
 /**

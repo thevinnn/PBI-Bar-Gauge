@@ -122,15 +122,15 @@ export class Visual implements IVisual {
 
 
 
-            // this.barScale.selectAll("rect")
-            //     .data(data)
-            //     .join("rect")
-            //     .attr("x", d => x(0))
-            //     .attr("y", d => y(d.category))
-            //     .attr("width", width - this.marginRight - this.marginLeft)  // width of the bar based on value
-            //     .attr("height", y.bandwidth())
-            //     .attr("fill", "#eee")
-            //     .attr("rx", 4);
+            this.barScale.selectAll("rect")
+                .data(data)
+                .join("rect")
+                .attr("x", d => x(0))
+                .attr("y", d => y(d.category))
+                .attr("width", width - this.marginRight - this.marginLeft)  // width of the bar based on value
+                .attr("height", y.bandwidth())
+                .attr("fill", "#eee")
+                .attr("rx", 4);
 
 
             const bars = this.barsGroup
@@ -176,6 +176,8 @@ export class Visual implements IVisual {
                 .attr("height", height)
                 .attr("viewBox", `0 0 ${width} ${height}`);
 
+
+            const dash = this.formattingSettings.targetLineSettings.TargetLineStyle.value.valueOf() === "solid" ? "none" : this.formattingSettings.targetLineSettings.TargetLineStyle.value.valueOf() === "dashed" ? "6,4" : "2,4";
             this.targetLine
                 .data(data) // Bind data to the line
                 .attr("x1", d => x(d.target)) // Add target value
@@ -183,8 +185,8 @@ export class Visual implements IVisual {
                 .attr("x2", d => x(d.target)) // Add target value
                 .attr("y2", height - (this.marginBottom * 1.3))
                 .attr("stroke", this.formattingSettings.targetLineSettings.TargetLineColour.value.value)
-                .attr("stroke-width", 2)
-                .attr("stroke-dasharray", "4,4");
+                .attr("stroke-width", this.formattingSettings.targetLineSettings.TargetLineVisible.value ? this.formattingSettings.targetLineSettings.TargetLineWidth.value.valueOf() : 0)
+                .attr("stroke-dasharray", dash);
 
             this.xAxisGroup
                 .attr("transform", `translate(0,${height - this.marginBottom})`)

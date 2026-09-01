@@ -50,6 +50,29 @@
                     "type": {
                         "bool": true
                     }
+                },
+                "TargetLineWidth": {
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "TargetLineStyle": {
+                    "type": {
+                        "enumeration": [
+                            {
+                                "value": "dashed",
+                                "displayName": "Dashed"
+                            },
+                            {
+                                "value": "solid",
+                                "displayName": "Solid"
+                            },
+                            {
+                                "value": "dotted",
+                                "displayName": "Dotted"
+                            }
+                        ]
+                    }
                 }
             }
         }
