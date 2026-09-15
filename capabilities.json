@@ -48,6 +48,16 @@
                             "fontSize": true
                         }
                     }
+                },
+                "enableAnimation": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "animationDuration": {
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
         }

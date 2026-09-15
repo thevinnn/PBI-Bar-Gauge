@@ -66,9 +66,21 @@ class DataPointCardSettings extends FormattingSettingsCard {
         value: 12
     });
 
+    enableAnimation = new formattingSettings.ToggleSwitch({
+        name: "enableAnimation",
+        displayName: "Enable animation",
+        value: true
+    });
+
+    animationDuration = new formattingSettings.NumUpDown({
+        name: "animationDuration",
+        displayName: "Animation duration (ms)",
+        value: 500
+    });
+
     name: string = "dataPoint";
     displayName: string = "Data colors";
-    slices: Array<FormattingSettingsSlice> = [this.defaultColor, this.showAllDataPoints, this.fill, this.fillRule, this.fontSize];
+    slices: Array<FormattingSettingsSlice> = [this.defaultColor, this.showAllDataPoints, this.fill, this.fillRule, this.fontSize, this.enableAnimation, this.animationDuration];
 }
 
 /**
