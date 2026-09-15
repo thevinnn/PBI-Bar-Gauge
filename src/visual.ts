@@ -85,14 +85,41 @@ export class Visual implements IVisual {
                 .range([this.marginLeft, width - this.marginRight]);                     // gap between bars
 
 
-            this.barsGroup.selectAll("rect")
-                .data(data)
-                .join("rect")
-                .attr("x", d => x(0))
-                .attr("y", d => y(d.month))
-                .attr("width", d => x(d.value) - x(0))  // width of the bar based on value
-                .attr("height", y.bandwidth())
-                .attr("fill", "steelblue");
+            const animationEnabled = this.formattingSettings.dataPointCard.enableAnimation.value;
+            const animationDuration = this.formattingSettings.dataPointCard.animationDuration.value;
+
+            this.barsGroup.selectAll<SVGRectElement, typeof data[0]>("rect")
+                .data(data, d => d.month)
+                .join(
+                    enter => {
+                        const rect = enter.append("rect")
+                            .attr("x", x(0))
+                            .attr("y", d => y(d.month))
+                            .attr("width", 0)
+                            .attr("height", y.bandwidth())
+                            .attr("fill", "steelblue");
+                        return animationEnabled
+                            ? rect.transition().duration(animationDuration)
+                                .attr("width", d => x(d.value) - x(0))
+                            : rect.attr("width", d => x(d.value) - x(0));
+                    },
+                    update => animationEnabled
+                        ? update.transition().duration(animationDuration)
+                            .attr("x", x(0))
+                            .attr("y", d => y(d.month))
+                            .attr("width", d => x(d.value) - x(0))
+                            .attr("height", y.bandwidth())
+                        : update
+                            .attr("x", x(0))
+                            .attr("y", d => y(d.month))
+                            .attr("width", d => x(d.value) - x(0))
+                            .attr("height", y.bandwidth()),
+                    exit => animationEnabled
+                        ? exit.transition().duration(animationDuration)
+                            .attr("width", 0)
+                            .remove()
+                        : exit.remove()
+                );
 
                 console.log('Bars drawn', this.barsGroup.selectAll("rect").attr("x"), this.barsGroup.selectAll("rect").attr("y"));
 
