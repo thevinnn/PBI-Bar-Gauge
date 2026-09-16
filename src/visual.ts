@@ -23,6 +23,7 @@ export class Visual implements IVisual {
     private xAxisGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
     private yAxisGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
     private barsGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
+    private barGradient: d3.Selection<SVGLinearGradientElement, unknown, null, undefined>;
 
     // Chart margins (kept as instance state so update() can reuse them)
     private readonly marginTop = 20;
@@ -52,6 +53,20 @@ export class Visual implements IVisual {
 
             this.barsGroup = this.svg.append("g")
                 .attr("class", "bars");
+
+            const defs = this.svg.append("defs");
+            this.barGradient = defs.append("linearGradient")
+                .attr("id", "bar-gradient")
+                .attr("x1", "0%")
+                .attr("y1", "0%")
+                .attr("x2", "100%")
+                .attr("y2", "0%");
+            this.barGradient.append("stop")
+                .attr("class", "gradient-start")
+                .attr("offset", "0%");
+            this.barGradient.append("stop")
+                .attr("class", "gradient-end")
+                .attr("offset", "100%");
         }
     }
 
@@ -88,6 +103,16 @@ export class Visual implements IVisual {
             const animationEnabled = this.formattingSettings.dataPointCard.enableAnimation.value;
             const animationDuration = this.formattingSettings.dataPointCard.animationDuration.value;
 
+            this.formattingSettings.dataPointCard.updateColorSliceVisibility();
+            const isGradient = this.formattingSettings.dataPointCard.colorMode.value.value === "gradient";
+            const singleColor = this.formattingSettings.dataPointCard.fill.value.value || "steelblue";
+            const barFill = isGradient ? "url(#bar-gradient)" : singleColor;
+
+            this.barGradient.select(".gradient-start")
+                .attr("stop-color", this.formattingSettings.dataPointCard.gradientStartColor.value.value);
+            this.barGradient.select(".gradient-end")
+                .attr("stop-color", this.formattingSettings.dataPointCard.gradientEndColor.value.value);
+
             this.barsGroup.selectAll<SVGRectElement, typeof data[0]>("rect")
                 .data(data, d => d.month)
                 .join(
@@ -97,23 +122,26 @@ export class Visual implements IVisual {
                             .attr("y", d => y(d.month))
                             .attr("width", 0)
                             .attr("height", y.bandwidth())
-                            .attr("fill", "steelblue");
+                            .attr("fill", barFill);
                         return animationEnabled
                             ? rect.transition().duration(animationDuration)
                                 .attr("width", d => x(d.value) - x(0))
                             : rect.attr("width", d => x(d.value) - x(0));
                     },
-                    update => animationEnabled
-                        ? update.transition().duration(animationDuration)
-                            .attr("x", x(0))
-                            .attr("y", d => y(d.month))
-                            .attr("width", d => x(d.value) - x(0))
-                            .attr("height", y.bandwidth())
-                        : update
-                            .attr("x", x(0))
-                            .attr("y", d => y(d.month))
-                            .attr("width", d => x(d.value) - x(0))
-                            .attr("height", y.bandwidth()),
+                    update => {
+                        update.attr("fill", barFill);
+                        return animationEnabled
+                            ? update.transition().duration(animationDuration)
+                                .attr("x", x(0))
+                                .attr("y", d => y(d.month))
+                                .attr("width", d => x(d.value) - x(0))
+                                .attr("height", y.bandwidth())
+                            : update
+                                .attr("x", x(0))
+                                .attr("y", d => y(d.month))
+                                .attr("width", d => x(d.value) - x(0))
+                                .attr("height", y.bandwidth());
+                    },
                     exit => animationEnabled
                         ? exit.transition().duration(animationDuration)
                             .attr("width", 0)
