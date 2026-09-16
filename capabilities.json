@@ -49,6 +49,32 @@
                         }
                     }
                 },
+                "colorMode": {
+                    "type": {
+                        "enumeration": [
+                            { "value": "single", "displayName": "Single color" },
+                            { "value": "gradient", "displayName": "Gradient" }
+                        ]
+                    }
+                },
+                "gradientStartColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "gradientEndColor": {
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
                 "enableAnimation": {
                     "type": {
                         "bool": true
