@@ -60,6 +60,28 @@ class DataPointCardSettings extends FormattingSettingsCard {
         value: { value: "" }
     });
 
+    colorMode = new formattingSettings.ItemDropdown({
+        name: "colorMode",
+        displayName: "Color mode",
+        items: [
+            { value: "single", displayName: "Single color" },
+            { value: "gradient", displayName: "Gradient" }
+        ],
+        value: { value: "single", displayName: "Single color" }
+    });
+
+    gradientStartColor = new formattingSettings.ColorPicker({
+        name: "gradientStartColor",
+        displayName: "Gradient start",
+        value: { value: "#1f77b4" }
+    });
+
+    gradientEndColor = new formattingSettings.ColorPicker({
+        name: "gradientEndColor",
+        displayName: "Gradient end",
+        value: { value: "#d62728" }
+    });
+
     fontSize = new formattingSettings.NumUpDown({
         name: "fontSize",
         displayName: "Text Size",
@@ -80,7 +102,15 @@ class DataPointCardSettings extends FormattingSettingsCard {
 
     name: string = "dataPoint";
     displayName: string = "Data colors";
-    slices: Array<FormattingSettingsSlice> = [this.defaultColor, this.showAllDataPoints, this.fill, this.fillRule, this.fontSize, this.enableAnimation, this.animationDuration];
+    slices: Array<FormattingSettingsSlice> = [this.defaultColor, this.showAllDataPoints, this.fill, this.fillRule, this.fontSize, this.colorMode, this.gradientStartColor, this.gradientEndColor, this.enableAnimation, this.animationDuration];
+
+    /** Show gradient color pickers only in gradient mode, and the single fill color only in single mode. */
+    public updateColorSliceVisibility(): void {
+        const isGradient = this.colorMode.value.value === "gradient";
+        this.fill.visible = !isGradient;
+        this.gradientStartColor.visible = isGradient;
+        this.gradientEndColor.visible = isGradient;
+    }
 }
 
 /**
